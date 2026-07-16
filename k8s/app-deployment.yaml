@@ -5,7 +5,7 @@ metadata:
   name: release-platform
 
 spec:
-  replicas: 2
+  replicas: 3
 
   selector:
     matchLabels:
@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
         - name: release-platform
-          image: autonomous-release-platform:v3
-          imagePullPolicy: Never
+          image: ghcr.io/rohannsaxena2609/autonomous-release-platform:c4bf729b0c89779d4ff5913376a69e7bab9fdd30
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 8080
