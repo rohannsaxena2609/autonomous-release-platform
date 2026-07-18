@@ -10,7 +10,7 @@ spec:
     - name: application-availability
       interval: 20s
       count: 3
-      successCondition: "len(result) > 0 && result[0] >= 1"
+      successCondition: "len(result) > 0 && result[0] >= 2"      
       failureLimit: 2
 
       provider:
