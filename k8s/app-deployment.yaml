@@ -44,24 +44,29 @@ spec:
                   name: release-platform-secret
                   key: SPRING_DATASOURCE_PASSWORD
 
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/readiness
               port: 8080
-            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 6
 
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 40
             periodSeconds: 20
             timeoutSeconds: 3
             failureThreshold: 3
-
           resources:
             requests:
               memory: "256Mi"
