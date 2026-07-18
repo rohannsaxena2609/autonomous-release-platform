@@ -30,14 +30,27 @@ spec:
       steps:
         - setWeight: 25
 
-        - pause: {}
+        - pause:
+            duration: 30s
+
+        - analysis:
+            templates:
+              - templateName: release-platform-health
 
         - setWeight: 50
 
         - pause:
             duration: 30s
 
+        - analysis:
+            templates:
+              - templateName: release-platform-health
+
         - setWeight: 75
 
         - pause:
             duration: 30s
+
+        - analysis:
+            templates:
+              - templateName: release-platform-health

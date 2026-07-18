@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+
+metadata:
+  name: release-platform-health
+  namespace: default
+
+spec:
+  metrics:
+    - name: application-availability
+      interval: 20s
+      count: 3
+      successCondition: "len(result) > 0 && result[0] >= 1"
+      failureLimit: 2
+
+      provider:
+        prometheus:
+          address: http://prometheus-service.default.svc.cluster.local:9090
+          timeout: 10
+          query: |
+            sum(up{job="autonomous-release-platform"})
+
+    - name: http-error-rate
+      interval: 20s
+      count: 3
+      successCondition: "len(result) > 0 && result[0] <= 0.05"
+      failureLimit: 2
+
+      provider:
+        prometheus:
+          address: http://prometheus-service.default.svc.cluster.local:9090
+          timeout: 10
+          query: |
+            (
+              sum(
+                rate(
+                  http_server_requests_seconds_count{
+                    job="autonomous-release-platform",
+                    status=~"5.."
+                  }[2m]
+                )
+              )
+              /
+              clamp_min(
+                sum(
+                  rate(
+                    http_server_requests_seconds_count{
+                      job="autonomous-release-platform"
+                    }[2m]
+                  )
+                ),
+                0.001
+              )
+            )
+            or vector(0)
