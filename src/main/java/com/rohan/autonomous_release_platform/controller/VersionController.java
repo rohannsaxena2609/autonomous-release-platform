@@ -16,8 +16,8 @@ public class VersionController {
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("application", "Autonomous Release Orchestration Platform");
-        response.put("version", "2.0.0-canary");
-        response.put("environment", "Canary");        
+        response.put("version", "2.1.0-rollback-test");
+        response.put("environment", "Rollback Test");     
         response.put("javaVersion", System.getProperty("java.version"));
         response.put("serverTime", LocalDateTime.now());
 
