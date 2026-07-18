@@ -30,6 +30,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      
+      - name: Notify Slack - pipeline started
+        if: ${{ github.event_name == 'push' }}
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY' > /tmp/slack-payload.json
+          import json
+          import os
+
+          text = (
+              "🚀 *CI/CD pipeline started*\n"
+              f"*Repository:* {os.environ['GITHUB_REPOSITORY']}\n"
+              f"*Branch:* {os.environ['GITHUB_REF_NAME']}\n"
+              f"*Commit:* {os.environ['GITHUB_SHA'][:7]}\n"
+              f"*Triggered by:* {os.environ['GITHUB_ACTOR']}\n"
+              f"*Run:* {os.environ['RUN_URL']}"
+          )
+
+          print(json.dumps({"text": text}))
+          PY
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data @/tmp/slack-payload.json \
+            "$SLACK_WEBHOOK_URL"  
+        
       - name: Checkout repository
         uses: actions/checkout@v5
 
@@ -86,6 +116,7 @@ jobs:
           exit-code: '0'
 
       - name: Block images with critical vulnerabilities
+        id: trivy_critical
         if: github.event_name == 'push'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -97,6 +128,34 @@ jobs:
           ignore-unfixed: true
           exit-code: '1'
           skip-setup-trivy: true
+            
+      - name: Notify Slack - security gate failed
+        if: ${{ failure() && github.event_name == 'push' && steps.trivy_critical.outcome == 'failure' }}
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY' > /tmp/slack-payload.json
+          import json
+          import os
+
+          text = (
+              "🔐 *Container security gate failed*\n"
+              f"*Repository:* {os.environ['GITHUB_REPOSITORY']}\n"
+              f"*Commit:* {os.environ['GITHUB_SHA'][:7]}\n"
+              "*Stage:* Trivy critical vulnerability scan\n"
+              f"*Run:* {os.environ['RUN_URL']}"
+          )
+
+          print(json.dumps({"text": text}))
+          PY
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data @/tmp/slack-payload.json \
+            "$SLACK_WEBHOOK_URL"
 
       - name: Upload Trivy report to GitHub Security
         if: ${{ always() && github.event_name == 'push' }}
@@ -159,3 +218,63 @@ jobs:
             git commit -m "chore: deploy image ${GITHUB_SHA}"
             git push
           fi
+        
+      - name: Notify Slack - pipeline succeeded
+        if: ${{ success() && github.event_name == 'push' }}
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          python3 - <<'PY' > /tmp/slack-payload.json
+          import json
+          import os
+
+          text = (
+              "✅ *CI/CD pipeline succeeded*\n"
+              f"*Repository:* {os.environ['GITHUB_REPOSITORY']}\n"
+              f"*Branch:* {os.environ['GITHUB_REF_NAME']}\n"
+              f"*Commit:* {os.environ['GITHUB_SHA'][:7]}\n"
+              f"*Image:* `{os.environ['IMAGE_URI']}`\n"
+              "*GitOps:* Kubernetes manifest updated\n"
+              f"*Run:* {os.environ['RUN_URL']}"
+          )
+
+          print(json.dumps({"text": text}))
+          PY
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data @/tmp/slack-payload.json \
+            "$SLACK_WEBHOOK_URL"
+            
+      - name: Notify Slack - pipeline failed
+        if: ${{ failure() && github.event_name == 'push' && steps.trivy_critical.outcome != 'failure' }}
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY' > /tmp/slack-payload.json
+          import json
+          import os
+
+          text = (
+              "❌ *CI/CD pipeline failed*\n"
+              f"*Repository:* {os.environ['GITHUB_REPOSITORY']}\n"
+              f"*Branch:* {os.environ['GITHUB_REF_NAME']}\n"
+              f"*Commit:* {os.environ['GITHUB_SHA'][:7]}\n"
+              f"*Triggered by:* {os.environ['GITHUB_ACTOR']}\n"
+              f"*Run:* {os.environ['RUN_URL']}"
+          )
+
+          print(json.dumps({"text": text}))
+          PY
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data @/tmp/slack-payload.json \
+            "$SLACK_WEBHOOK_URL"
