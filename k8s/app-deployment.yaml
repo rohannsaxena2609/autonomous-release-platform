@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: release-platform
-          image: ghcr.io/rohannsaxena2609/autonomous-release-platform:c72098aadb5cc7caad1571cf52a9d44e68241a79
+          image: ghcr.io/rohannsaxena2609/autonomous-release-platform:ac3be5175b3b71e44cdaecf4d49c71b0e4b25af0
           imagePullPolicy: IfNotPresent
 
           ports:
