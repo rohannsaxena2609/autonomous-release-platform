@@ -11,10 +11,13 @@ spec:
     matchLabels:
       app: release-platform
 
-  template:
-    metadata:
-      labels:
-        app: release-platform
+    spec:
+      template:
+        metadata:
+          labels:
+            app: release-platform
+          annotations:
+            release-notification-test: "slack-test-1"
 
     spec:
       containers:
