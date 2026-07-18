@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: argo-rollouts-notification-configmap
+  namespace: argo-rollouts
+
+data:
+  service.webhook.slack_webhook: |
+    url: $slack-webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
+    retryMax: 3
+    retryWaitMin: 1s
+    retryWaitMax: 5s
+
+  template.rollout-updated-slack: |
+    webhook:
+      slack_webhook:
+        method: POST
+        body: |
+          {
+            "text": "🚀 *Argo Rollout started or updated*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Strategy:* Canary"
+          }
+
+  template.rollout-step-completed-slack: |
+    webhook:
+      slack_webhook:
+        method: POST
+        body: |
+          {
+            "text": "🔄 *Canary step completed*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Step:* {{add .rollout.status.currentStepIndex 1}}/{{len .rollout.spec.strategy.canary.steps}}\n*Namespace:* `{{.rollout.metadata.namespace}}`"
+          }
+
+  template.analysis-run-failed-slack: |
+    webhook:
+      slack_webhook:
+        method: POST
+        body: |
+          {
+            "text": "❌ *Canary analysis failed*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Action:* Promotion stopped and stable release retained"
+          }
+
+  template.rollout-aborted-slack: |
+    webhook:
+      slack_webhook:
+        method: POST
+        body: |
+          {
+            "text": "⛔ *Rollout aborted*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Action:* Previous stable release remains active"
+          }
+
+  template.rollout-completed-slack: |
+    webhook:
+      slack_webhook:
+        method: POST
+        body: |
+          {
+            "text": "✅ *Rollout completed successfully*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Traffic:* 100% promoted"
+          }
+
+  trigger.on-rollout-updated: |
+    - send:
+        - rollout-updated-slack
+
+  trigger.on-rollout-step-completed: |
+    - send:
+        - rollout-step-completed-slack
+
+  trigger.on-analysis-run-failed: |
+    - send:
+        - analysis-run-failed-slack
+
+  trigger.on-rollout-aborted: |
+    - send:
+        - rollout-aborted-slack
+
+  trigger.on-rollout-completed: |
+    - send:
+        - rollout-completed-slack
