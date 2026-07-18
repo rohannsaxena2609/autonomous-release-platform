@@ -11,9 +11,6 @@ data:
     headers:
       - name: Content-Type
         value: application/json
-    retryMax: 3
-    retryWaitMin: 1s
-    retryWaitMax: 5s
 
   template.rollout-updated-slack: |
     webhook:
