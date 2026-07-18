@@ -1,13 +1,19 @@
 name: CI Publish and Deploy
 
 on:
-  push:
-    branches:
-      - main
-
-  pull_request:
-    branches:
-      - main
+    push:
+      branches:
+        - main
+  
+      paths-ignore:
+        - "k8s/**"
+        - "argocd/**"
+        - "monitoring/**"
+        - "**/*.md"
+  
+    pull_request:
+      branches:
+        - main
 
 permissions:
   contents: write
