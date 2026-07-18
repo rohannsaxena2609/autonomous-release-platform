@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: release-platform-rollout
+  namespace: default
+  labels:
+    app: release-platform
+
+spec:
+  replicas: 4
+
+  revisionHistoryLimit: 3
+
+  selector:
+    matchLabels:
+      app: release-platform
+
+  workloadRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: release-platform
+    scaleDown: never
+
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+
+      steps:
+        - setWeight: 25
+
+        - pause: {}
+
+        - setWeight: 50
+
+        - pause:
+            duration: 30s
+
+        - setWeight: 75
+
+        - pause:
+            duration: 30s
