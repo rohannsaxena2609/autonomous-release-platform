@@ -3,10 +3,19 @@ kind: Rollout
 
 metadata:
   name: release-platform-rollout
-  namespace: default
+  namespace: defaul
   labels:
     app: release-platform
-
+  metadata:
+  name: release-platform-rollout
+  namespace: default
+  annotations:
+    notifications.argoproj.io/subscribe.on-rollout-updated.slack_webhook: ""
+    notifications.argoproj.io/subscribe.on-rollout-step-completed.slack_webhook: ""
+    notifications.argoproj.io/subscribe.on-analysis-run-failed.slack_webhook: ""
+    notifications.argoproj.io/subscribe.on-rollout-aborted.slack_webhook: ""
+    notifications.argoproj.io/subscribe.on-rollout-completed.slack_webhook: ""
+ 
 spec:
   replicas: 4
 
