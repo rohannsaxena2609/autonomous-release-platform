@@ -17,7 +17,7 @@ spec:
           labels:
             app: release-platform
           annotations:
-            release-notification-test: "slack-test-1"
+            release-notification-test: "slack-failure-test-1"
 
     spec:
       containers:
