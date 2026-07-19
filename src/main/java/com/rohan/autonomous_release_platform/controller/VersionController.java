@@ -16,7 +16,7 @@ public class VersionController {
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("application", "Autonomous Release Orchestration Platform");
-        response.put("version", "2.2.0");
+        response.put("version", "2.2.1");
         response.put("environment", "Production");  
         response.put("javaVersion", System.getProperty("java.version"));
         response.put("serverTime", LocalDateTime.now());
