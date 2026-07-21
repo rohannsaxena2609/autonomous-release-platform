@@ -3,6 +3,9 @@ kind: Deployment
 
 metadata:
   name: release-platform
+  namespace: default
+  labels:
+    app: release-platform
 
 spec:
   replicas: 0
@@ -11,12 +14,10 @@ spec:
     matchLabels:
       app: release-platform
 
-    spec:
-      template:
-        metadata:
-          labels:
-            app: release-platform
-          annotations:
+  template:
+    metadata:
+      labels:
+        app: release-platform
 
     spec:
       containers:
