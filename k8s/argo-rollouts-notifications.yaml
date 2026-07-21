@@ -57,22 +57,27 @@ data:
             "text": "✅ *Rollout completed successfully*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Traffic:* 100% promoted"
           }
 
-  trigger.on-rollout-updated: |
+    trigger.on-rollout-updated: |
     - send:
         - rollout-updated-slack
+      when: rollout.status.phase == 'Progressing'
 
   trigger.on-rollout-step-completed: |
     - send:
         - rollout-step-completed-slack
+      when: rollout.status.currentStepIndex != nil
 
   trigger.on-analysis-run-failed: |
     - send:
         - analysis-run-failed-slack
+      when: rollout.status.phase == 'Degraded'
 
   trigger.on-rollout-aborted: |
     - send:
         - rollout-aborted-slack
+      when: rollout.status.abort == true
 
   trigger.on-rollout-completed: |
     - send:
         - rollout-completed-slack
+      when: rollout.status.phase == 'Healthy'
