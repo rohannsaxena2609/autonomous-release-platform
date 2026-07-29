@@ -1,0 +1,36 @@
+alertmanager:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+server:
+  persistentVolume:
+    enabled: false
+
+  retention: "6h"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+  service:
+    type: ClusterIP
+
+extraScrapeConfigs: |
+  - job_name: release-platform
+    metrics_path: /actuator/prometheus
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - release-platform-service.default.svc.cluster.local:80
