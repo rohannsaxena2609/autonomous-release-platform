@@ -18,7 +18,7 @@ spec:
           address: http://prometheus-server.monitoring.svc.cluster.local
           timeout: 10
           query: |
-            sum(up{job="autonomous-release-platform"})
+            sum(up{job="release-platform"})
 
     - name: http-error-rate
       interval: 20s
@@ -35,7 +35,7 @@ spec:
               sum(
                 rate(
                   http_server_requests_seconds_count{
-                    job="autonomous-release-platform",
+                    job="release-platform",
                     status=~"5.."
                   }[2m]
                 )
@@ -45,7 +45,7 @@ spec:
                 sum(
                   rate(
                     http_server_requests_seconds_count{
-                      job="autonomous-release-platform"
+                      job="release-platform"
                     }[2m]
                   )
                 ),
