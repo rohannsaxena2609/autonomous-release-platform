@@ -1,6 +1,5 @@
 apiVersion: v1
 kind: ConfigMap
-
 metadata:
   name: argo-rollouts-notification-configmap
   namespace: argo-rollouts
@@ -57,7 +56,7 @@ data:
             "text": "✅ *Rollout completed successfully*\n*Rollout:* `{{.rollout.metadata.name}}`\n*Namespace:* `{{.rollout.metadata.namespace}}`\n*Traffic:* 100% promoted"
           }
 
-    trigger.on-rollout-updated: |
+  trigger.on-rollout-updated: |
     - send:
         - rollout-updated-slack
       when: rollout.status.phase == 'Progressing'
