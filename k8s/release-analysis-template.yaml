@@ -15,7 +15,7 @@ spec:
 
       provider:
         prometheus:
-          address: http://prometheus-service.default.svc.cluster.local:9090
+          address: http://prometheus-server.monitoring.svc.cluster.local
           timeout: 10
           query: |
             sum(up{job="autonomous-release-platform"})
@@ -28,7 +28,7 @@ spec:
 
       provider:
         prometheus:
-          address: http://prometheus-service.default.svc.cluster.local:9090
+          address: http://prometheus-server.monitoring.svc.cluster.local
           timeout: 10
           query: |
             (
