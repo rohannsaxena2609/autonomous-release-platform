@@ -46,8 +46,6 @@ spec:
                 secretKeyRef:
                   name: release-platform-secret
                   key: SPRING_DATASOURCE_PASSWORD
-            - name: SLACK_FAILURE_TEST
-              value: "true"
 
 
 
