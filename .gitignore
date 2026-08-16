@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets / macOS
+.DS_Store
+k8s/secret.yaml
+.env
