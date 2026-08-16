@@ -69,12 +69,10 @@ data:
   trigger.on-analysis-run-failed: |
     - send:
         - analysis-run-failed-slack
-      when: rollout.status.phase == 'Degraded'
 
   trigger.on-rollout-aborted: |
     - send:
         - rollout-aborted-slack
-      when: rollout.status.abort == true
 
   trigger.on-rollout-completed: |
     - send:
